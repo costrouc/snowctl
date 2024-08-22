@@ -14,16 +14,16 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("creating snowflake connection manager %w", err)
 	}
-	connectionName := "snowsql.default"
-	err = cm.SetClient(connectionName)
+
+	err = cm.SetDefault()
 	if err != nil {
-		return fmt.Errorf("create client from connection manager %s %w", connectionName, err)
+		return fmt.Errorf("create client from connection manager %w", err)
 	}
 
 	applicationState := components.NewApplication(cm)
 
 	ctx := context.Background()
-	applicationState.Push(ctx, components.NewUsersView(cm, &components.UsersOptions{}))
+	applicationState.Push(ctx, components.NewRolesView(cm, &components.RolesOptions{}))
 
 	if err := applicationState.Application.Run(); err != nil {
 		return err

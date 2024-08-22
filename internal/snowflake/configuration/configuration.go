@@ -21,11 +21,13 @@ type Connection struct {
 	Account       string `toml:"account"`
 	User          string `toml:"user"`
 	Password      string `toml:"password"`
-	Authenticator string `toml:"authenticator"`
-	Warehouse     string `toml:"warehouse"`
-	Rolename      string `toml:"rolename"`
+	Region        string `toml:"region"`
+	Host          string `toml:"host"`
 	Database      string `toml:"database"`
 	Schema        string `toml:"schema"`
+	Role          string `toml:"role"`
+	Warehouse     string `toml:"warehouse"`
+	Authenticator string `toml:"authenticator"`
 }
 
 type ConfigToml struct {
@@ -45,11 +47,13 @@ func (c *Connection) SnowflakeConfig() *sf.Config {
 		Account:       c.Account,
 		User:          c.User,
 		Password:      c.Password,
-		Authenticator: authType,
-		Warehouse:     c.Warehouse,
-		Role:          c.Rolename,
+		Region:        c.Region,
+		Host:          c.Host,
 		Database:      c.Database,
 		Schema:        c.Schema,
+		Role:          c.Role,
+		Warehouse:     c.Warehouse,
+		Authenticator: authType,
 	}
 }
 
@@ -114,20 +118,15 @@ func readConnectionsToml(directory string) (*ConnectionsToml, error) {
 			os.Getenv("SNOWFLAKE_PASSWORD"),
 			connection.Password,
 		)
-		connection.Authenticator = cmp.Or(
-			os.Getenv(fmt.Sprintf("SNOWFLAKE_CONNECTIONS_%s_AUTHENTICATOR", strings.ToUpper(name))),
-			os.Getenv("SNOWFLAKE_AUTHENTICATOR"),
-			connection.Authenticator,
+		connection.Region = cmp.Or(
+			os.Getenv(fmt.Sprintf("SNOWFLAKE_CONNECTIONS_%s_REGION", strings.ToUpper(name))),
+			os.Getenv("SNOWFLAKE_REGION"),
+			connection.Region,
 		)
-		connection.Warehouse = cmp.Or(
-			os.Getenv(fmt.Sprintf("SNOWFLAKE_CONNECTIONS_%s_WAREHOUSE", strings.ToUpper(name))),
-			os.Getenv("SNOWFLAKE_WAREHOUSE"),
-			connection.Warehouse,
-		)
-		connection.Rolename = cmp.Or(
-			os.Getenv(fmt.Sprintf("SNOWFLAKE_CONNECTIONS_%s_ROLE", strings.ToUpper(name))),
-			os.Getenv("SNOWFLAKE_ROLE"),
-			connection.Rolename,
+		connection.Host = cmp.Or(
+			os.Getenv(fmt.Sprintf("SNOWFLAKE_CONNECTIONS_%s_HOST", strings.ToUpper(name))),
+			os.Getenv("SNOWFLAKE_HOST"),
+			connection.Host,
 		)
 		connection.Database = cmp.Or(
 			os.Getenv(fmt.Sprintf("SNOWFLAKE_CONNECTIONS_%s_DATABASE", strings.ToUpper(name))),
@@ -138,6 +137,21 @@ func readConnectionsToml(directory string) (*ConnectionsToml, error) {
 			os.Getenv(fmt.Sprintf("SNOWFLAKE_CONNECTIONS_%s_SCHEMA", strings.ToUpper(name))),
 			os.Getenv("SNOWFLAKE_SCHEMA"),
 			connection.Schema,
+		)
+		connection.Role = cmp.Or(
+			os.Getenv(fmt.Sprintf("SNOWFLAKE_CONNECTIONS_%s_ROLE", strings.ToUpper(name))),
+			os.Getenv("SNOWFLAKE_ROLE"),
+			connection.Role,
+		)
+		connection.Warehouse = cmp.Or(
+			os.Getenv(fmt.Sprintf("SNOWFLAKE_CONNECTIONS_%s_WAREHOUSE", strings.ToUpper(name))),
+			os.Getenv("SNOWFLAKE_WAREHOUSE"),
+			connection.Warehouse,
+		)
+		connection.Authenticator = cmp.Or(
+			os.Getenv(fmt.Sprintf("SNOWFLAKE_CONNECTIONS_%s_AUTHENTICATOR", strings.ToUpper(name))),
+			os.Getenv("SNOWFLAKE_AUTHENTICATOR"),
+			connection.Authenticator,
 		)
 	}
 

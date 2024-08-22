@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+ - Changed default connection to default to connection specified in `connections.toml`. Additionally listens to default and then picks the first one alphabetically if no default is specified.
+
 ## [2024-08-22] v0.2.2
 
  - Adding Apache 2.0 license

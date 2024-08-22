@@ -2,6 +2,7 @@ package snowflake
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	sf "github.com/snowflakedb/gosnowflake"
@@ -70,6 +71,29 @@ func (cm *ConnectionManager) AvailableClients() map[string]*sf.Config {
 	}
 
 	return connections
+}
+
+func (cm *ConnectionManager) SetDefault() error {
+	availableConnections := cm.AvailableClients()
+	if len(availableConnections) == 0 {
+		return fmt.Errorf("no connections listed in connections.toml or snowsql configuration files")
+	}
+
+	if availableConnections["snowflake.default"] != nil {
+		return cm.SetClient("snowflake.default")
+	}
+	if availableConnections["snowsql.default"] != nil {
+		return cm.SetClient("snowsql.default")
+	}
+
+	// be consistent and if no default set choose
+	// the alphabetically first connection name
+	connectionNames := make([]string, 0)
+	for connectionName, _ := range availableConnections {
+		connectionNames = append(connectionNames, connectionName)
+	}
+	slices.Sort(connectionNames)
+	return cm.SetClient(connectionNames[0])
 }
 
 func (cm *ConnectionManager) SetClient(name string) error {
